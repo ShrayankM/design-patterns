@@ -1,4 +1,4 @@
-package org.example.decoratorPattern;
+package org.example.decoratorPattern.coffee;
 
 public class CoffeeDemo {
 	public static void main(String [] args) {

@@ -1,14 +1,14 @@
-package org.example.decoratorPattern;
+package org.example.decoratorPattern.coffee;
 
 import java.math.BigDecimal;
 
-public class Espresso implements Beverage {
+public class DarkRoast implements Beverage {
 	private final BigDecimal cost;
 	private final String description;
 
-	public Espresso() {
-		this.cost = new BigDecimal("16.99");
-		this.description = "Espresso";
+	public DarkRoast() {
+		this.cost = new BigDecimal("10.59");
+		this.description = "Dark-Roast";
 	}
 
 	@Override
