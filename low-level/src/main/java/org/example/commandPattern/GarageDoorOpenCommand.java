@@ -1,0 +1,15 @@
+package org.example.commandPattern;
+
+public class GarageDoorOpenCommand implements Command {
+	private final GarageDoor garageDoor;
+
+	public GarageDoorOpenCommand(GarageDoor garageDoor) {
+		this.garageDoor = garageDoor;
+	}
+
+	@Override
+	public void execute() {
+		this.garageDoor.lightOn();
+		this.garageDoor.up();
+	}
+}
