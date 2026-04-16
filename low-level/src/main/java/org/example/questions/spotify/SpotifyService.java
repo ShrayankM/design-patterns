@@ -13,6 +13,15 @@ public class SpotifyService {
 	private SongSearchService songSearchService;
 	private SongRecommendationService songRecommendationService;
 
+	// recommendation strategies
+	RecommendationStrategy historyRecommendation;
+	RecommendationStrategy likeDislikeRecommendation;
+
+	// search strategies
+	SongSearchStrategy byName;
+	SongSearchStrategy byArtist;
+	SongSearchStrategy byAlbum;
+
 	public SpotifyService() {
 		this.songLibrary = new SongLibrary();
 		this.playbackService = new PlaybackService();
@@ -20,6 +29,15 @@ public class SpotifyService {
 		this.songLikeDislikeService = new SongLikeDislikeService(this.songLibrary);
 		this.songSearchService = new SongSearchService(this.songLibrary);
 		this.songRecommendationService = new SongRecommendationService();
+
+		// recommendation
+		this.historyRecommendation = new SongHistoryRecommendationStrategy(this.playbackService);
+		this.likeDislikeRecommendation = new SongLikeDislikeRecommendationStrategy(this.songLikeDislikeService);
+
+		// search
+		this.byName = new SongNameSearchStrategy(this.songSearchService);
+		this.byArtist =  new SongArtistSearchStrategy(songSearchService);
+		this.byAlbum = new SongAlbumSearchStrategy(songSearchService);
 	}
 
 	public void playSong(Song song, User user) {
@@ -51,22 +69,18 @@ public class SpotifyService {
 	}
 
 	public List<Song> recommendSongsUsingHistory(User user) {
-		RecommendationStrategy recommendationStrategy = new SongHistoryRecommendationStrategy(this.playbackService);
-		this.songRecommendationService.setRecommendationStrategy(recommendationStrategy);
-		return this.songRecommendationService.recommendSongs(user);
+		return this.songRecommendationService.recommendSongs(user, historyRecommendation);
 	}
 
 	public List<Song> recommendSongsByLikeAndDislike(User user) {
-		RecommendationStrategy recommendationStrategy = new SongLikeDislikeRecommendationStrategy(this.songLikeDislikeService);
-		this.songRecommendationService.setRecommendationStrategy(recommendationStrategy);
-		return this.songRecommendationService.recommendSongs(user);
+		return this.songRecommendationService.recommendSongs(user, likeDislikeRecommendation);
 	}
 
 	public List<Song> searchSong(SearchType type, SongSearchQuery query) {
 		SongSearchStrategy strategy = switch (type) {
-			case BY_NAME   -> new SongNameSearchStrategy(songSearchService);
-			case BY_ARTIST -> new SongArtistSearchStrategy(songSearchService);
-			case BY_ALBUM  -> new SongAlbumSearchStrategy(songSearchService);
+			case BY_NAME   -> byName;
+			case BY_ARTIST -> byArtist;
+			case BY_ALBUM  -> byAlbum;
 		};
 		return strategy.searchSongs(query);
 	}

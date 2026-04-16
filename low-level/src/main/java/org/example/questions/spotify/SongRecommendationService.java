@@ -6,16 +6,7 @@ import java.util.List;
 
 @Data
 public class SongRecommendationService {
-	private RecommendationStrategy recommendationStrategy;
-
-	public SongRecommendationService() {
-	}
-
-	public SongRecommendationService(RecommendationStrategy recommendationStrategy) {
-		this.recommendationStrategy = recommendationStrategy;
-	}
-
-	public List<Song> recommendSongs(User user) {
-		return this.recommendationStrategy.recommendSongs(user);
+	public List<Song> recommendSongs(User user, RecommendationStrategy recommendationStrategy) {
+		return recommendationStrategy.recommendSongs(user);
 	}
 }
