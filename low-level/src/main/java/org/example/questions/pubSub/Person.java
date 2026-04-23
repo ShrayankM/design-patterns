@@ -8,7 +8,8 @@ public class Person implements Subscriber {
 	}
 
 	@Override
-	public void receiveEvent(Data data) {
-		System.out.println("Person { " + this.name + "} received data = " + data.toString());
+	public boolean receiveEvent(Data data) {
+		System.out.println("Person{" + this.name + "} received: " + data);
+		return true;
 	}
 }

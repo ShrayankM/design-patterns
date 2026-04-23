@@ -1,16 +1,24 @@
 package org.example.questions.pubSub;
 
 public class Data {
-	private final String data;
-	private final String topicName;
+	private final String payload;
+	private final long timestamp;
 
-	public Data(String data, String topicName) {
-		this.data = data;
-		this.topicName = topicName;
+	public Data(String payload) {
+		this.payload = payload;
+		this.timestamp = System.currentTimeMillis();
+	}
+
+	public String getPayload() {
+		return payload;
+	}
+
+	public long getTimestamp() {
+		return timestamp;
 	}
 
 	@Override
 	public String toString() {
-		return "Data = [" + this.data + "], for topic {" + this.topicName + "}";
+		return "Data{payload='" + payload + "', timestamp=" + timestamp + "}";
 	}
 }
