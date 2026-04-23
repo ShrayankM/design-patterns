@@ -6,4 +6,9 @@ public class Government implements Subscriber {
 		System.out.println("Government received: " + data);
 		return true;
 	}
+
+	@Override
+	public void discontinueSubscription(Publisher publisher) {
+		publisher.removeSubscriber(this);
+	}
 }

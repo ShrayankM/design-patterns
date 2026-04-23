@@ -12,4 +12,10 @@ public class Person implements Subscriber {
 		System.out.println("Person{" + this.name + "} received: " + data);
 		return true;
 	}
+
+	@Override
+	public void discontinueSubscription(Publisher publisher) {
+		System.out.println("Person = " + name + " discontinued subscription of = " + publisher.getTopicName());
+		publisher.removeSubscriber(this);
+	}
 }

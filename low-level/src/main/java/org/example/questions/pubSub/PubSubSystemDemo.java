@@ -19,7 +19,8 @@ public class PubSubSystemDemo {
 		weatherTopic.publishEvent(new Data("Heavy rain expected tonight"));
 		sportsTopic.publishEvent(new Data("India won the match by 10 runs"));
 
-		weatherTopic.removeSubscriber(a);
+//		weatherTopic.removeSubscriber(a);
+		a.discontinueSubscription(weatherTopic);
 		weatherTopic.publishEvent(new Data("Sunny skies tomorrow — A unsubscribed, should not receive this"));
 	}
 }
