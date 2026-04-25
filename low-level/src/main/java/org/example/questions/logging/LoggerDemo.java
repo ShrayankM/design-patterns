@@ -2,27 +2,22 @@ package org.example.questions.logging;
 
 public class LoggerDemo {
 	public static void main(String[] args) throws InterruptedException {
-		Logger loggerDemo = LoggerFactory.getLogger(LoggerDemo.class);
-		// configure once
-		loggerDemo.addLogAppender(new ConsoleLogAppender(new FullLogFormatter()));
-		loggerDemo.setCurrentLogLevel(LogLevel.INFO);
+		// One-time global setup at app startup
+		Logger root = LoggerFactory.getRootLogger();
+		root.addLogAppender(new ConsoleLogAppender(new FullLogFormatter()));
+		root.addLogAppender(new FileLogAppender(new BasicLogFormatter(), "app.log"));
+		root.setCurrentLogLevel(LogLevel.INFO);
 
-		// anywhere else in the app — same instance returned
-		Logger sameLogger = LoggerFactory.getLogger(LoggerDemo.class);
-		sameLogger.info("reused logger");
+		// Any class in the app — no config needed, inherits from root
+		Logger orderLogger = LoggerFactory.getLogger(LoggerDemo.class);
+		orderLogger.info("Order placed");   // uses root's appenders
+		orderLogger.debug("debug skipped"); // filtered — level is INFO
 
-		LogFormatter logFormatter = new FullLogFormatter();
-		FileLogAppender fileLogAppender = new FileLogAppender(logFormatter, "logFile.txt");
-		fileLogAppender.disableLogAppender();
-		fileLogAppender.enabledLogAppender();
-		loggerDemo.addLogAppender(fileLogAppender);
-		loggerDemo.addLogAppender(new ConsoleLogAppender(logFormatter));
-		loggerDemo.setCurrentLogLevel(LogLevel.INFO);
+		// Override locally for a specific logger
+		Logger auditLogger = LoggerFactory.getLogger(LoggerDemo.class);
+		auditLogger.addLogAppender(new DBLogAppender(new FullLogFormatter()));
+		auditLogger.info("Audit event");    // uses its own DBLogAppender only
 
-		loggerDemo.debug("debug-log");
-		loggerDemo.info("info-log");
-		loggerDemo.error("error-log");
-
-		loggerDemo.shutdown(); // <-- needed
+		root.shutdown();
 	}
 }

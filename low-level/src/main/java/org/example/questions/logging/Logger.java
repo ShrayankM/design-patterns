@@ -10,83 +10,41 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
 public class Logger {
-	@Setter
+	private final String name;
+	private final Logger parent;
 	private LogLevel currentLogLevel;
-	private List<LogAppender> logAppenderList;
-	private String filename;
-
-	// Add field:
+	private final List<LogAppender> logAppenderList = new ArrayList<>();
 	private final ExecutorService executorService = Executors.newFixedThreadPool(
 			Runtime.getRuntime().availableProcessors());
 
-	public Logger(String filename) {
+	public Logger(String name, Logger parent) {
+		this.name = name;
+		this.parent = parent;
 		this.currentLogLevel = LogLevel.DEBUG;
-		this.logAppenderList = new ArrayList<>();
-		this.filename = filename;
 	}
 
-	public void addLogAppender(LogAppender logAppender) {
-		this.logAppenderList.add(logAppender);
-	}
+	public void setCurrentLogLevel(LogLevel level) { this.currentLogLevel = level; }
+	public void addLogAppender(LogAppender appender) { logAppenderList.add(appender); }
 
-	public void info(String message) {
-		if (LogLevel.INFO.ordinal() >= currentLogLevel.ordinal()) {
-			Log log = new Log(LogLevel.INFO, message, this.filename);
-			logAppenderList.forEach(logAppender -> {
-				if (logAppender.isEnabled) {
-					sendLog(log, logAppender);
-				}
-			});
+	public void debug(String message) { log(LogLevel.DEBUG, message); }
+	public void info(String message)  { log(LogLevel.INFO, message); }
+	public void warn(String message)  { log(LogLevel.WARN, message); }
+	public void error(String message) { log(LogLevel.ERROR, message); }
+	public void fatal(String message) { log(LogLevel.FATAL, message); }
+
+	private void log(LogLevel level, String message) {
+		if (level.ordinal() >= currentLogLevel.ordinal()) {
+			Log logEntry = new Log(level, message, this.name);
+			getEffectiveAppenders().stream()
+					.filter(a -> a.isEnabled)
+					.forEach(a -> executorService.submit(() -> a.appendLog(logEntry)));
 		}
 	}
 
-	public void debug(String message) {
-		if (LogLevel.DEBUG.ordinal() == currentLogLevel.ordinal()) {
-			Log log = new Log(LogLevel.DEBUG, message, this.filename);
-			logAppenderList.forEach(logAppender -> {
-				if (logAppender.isEnabled) {
-					sendLog(log, logAppender);
-				}
-			});
-		}
-	}
-
-	public void warn(String message) {
-		if (LogLevel.WARN.ordinal() >= currentLogLevel.ordinal()) {
-			Log log = new Log(LogLevel.WARN, message, this.filename);
-			logAppenderList.forEach(logAppender -> {
-				if (logAppender.isEnabled) {
-					sendLog(log, logAppender);
-				}
-			});
-		}
-	}
-
-	public void error(String message) {
-		if (LogLevel.ERROR.ordinal() >= currentLogLevel.ordinal()) {
-			Log log = new Log(LogLevel.ERROR, message, this.filename);
-			logAppenderList.forEach(logAppender -> {
-				if (logAppender.isEnabled) {
-					sendLog(log, logAppender);
-				}
-			});
-		}
-	}
-
-//	public void createLog(LogLevel logLevel, String message, String filename) {
-//		if (logLevel.ordinal() >= currentLogLevel.ordinal()) {
-//			Log log = new Log(logLevel, message, filename);
-//			logAppenderList.forEach(logAppender -> {
-//				if (logAppender.isEnabled) {
-//					sendLog(log, logAppender);
-//				}
-//			});
-//		}
-//	}
-
-	// Change sendLog to:
-	private void sendLog(Log log, LogAppender logAppender) {
-		executorService.submit(() -> logAppender.appendLog(log));
+	private List<LogAppender> getEffectiveAppenders() {
+		return logAppenderList.isEmpty() && parent != null
+				? parent.logAppenderList
+				: logAppenderList;
 	}
 
 	public void shutdown() throws InterruptedException {
