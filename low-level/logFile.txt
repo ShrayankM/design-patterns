@@ -1,0 +1,5 @@
+Id #64ee4bcd-f2e6-49c3-8b2f-6c6ec51d6a38 Timestamp = [2026-04-25T17:32:19.934901], Message = {info-log}Type = INFO file LoggerDemo.class
+Id #a2ccf2c2-dc41-48f4-a5ea-d4c86916800b Timestamp = [2026-04-25T17:32:19.936322], Message = {fatal-log}Type = FATAL file LoggerDemo.class
+Id #fc37334f-c1a1-46e9-a873-c5c9ce738f03 Timestamp = [2026-04-25T17:32:19.935882], Message = {error-log}Type = ERROR file LoggerDemo.class
+Id #f062516d-f769-4c95-8486-508edb280792 Timestamp = [2026-04-25T17:51:00.606022], Message = {info-log}Type = INFO file org.example.questions.logging.LoggerDemo
+Id #1f076ed0-c45b-4f6c-80eb-8e89dde6c5a3 Timestamp = [2026-04-25T17:51:00.606403], Message = {error-log}Type = ERROR file org.example.questions.logging.LoggerDemo
