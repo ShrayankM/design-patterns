@@ -17,7 +17,7 @@ public class TicTacToeRuleEngine implements GameRuleEngine {
 		GameState reverseDiagonalState = checkReverseDiagonal(board);
 		if (reverseDiagonalState.isGameCompleted()) return reverseDiagonalState;
 
-		return new GameState(false, null);
+		return checkDraw(board);
 	}
 
 	private GameState checkRows(Board board) {

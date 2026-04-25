@@ -68,6 +68,6 @@ public class Game {
 	}
 
 	public Board getGameBoard() {
-		return this.getGameBoard();
+		return this.board;
 	}
 }
