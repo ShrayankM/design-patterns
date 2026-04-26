@@ -1,5 +1,6 @@
 package org.example.questions.notification;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
@@ -80,15 +81,17 @@ public class MessageService {
 
 	public void sendMessage(Template template, List<String> templateData, MessagePriority messagePriority,
 			User user, List<NotificationChannel> notificationChannelList) {
-		Message message = buildMessage(template, templateData, messagePriority, user, notificationChannelList);
-		synchronized (messageQueue) {
-			messageQueue.offer(message);
-			messageQueue.notify();
+		List<Message> messageList = buildMessage(template, templateData, messagePriority, user, notificationChannelList);
+		for (Message message : messageList) {
+			synchronized (messageQueue) {
+				messageQueue.offer(message);
+				messageQueue.notify();
+			}
 		}
 	}
 
 	private void processMessage(Message message) {
-		for (NotificationChannel channel : message.getNotificationChannelList()) {
+			NotificationChannel channel = message.getNotificationChannel();
 			boolean isDelivered = channel.sendNotification(message);
 			if (isDelivered) {
 				message.setMessageStatus(MessageStatus.SENT);
@@ -101,7 +104,7 @@ public class MessageService {
 					retryQueue.notify();  // <-- this is what L69 needs to be synchronized for
 				}
 			}
-		}
+
 	}
 
 	private void retryMessage(Message message) throws InterruptedException {
@@ -112,31 +115,35 @@ public class MessageService {
 			return;
 		}
 		message.setRetryCount(message.getRetryCount() + 1);
-		for (NotificationChannel channel : message.getNotificationChannelList()) {
+		NotificationChannel channel = message.getNotificationChannel();
 			boolean isDelivered = channel.sendNotification(message);
 			if (isDelivered) {
 				message.setMessageStatus(MessageStatus.SENT);
 				messagesHistory.add(message);
 				return;
 			}
-		}
+
 		synchronized (retryQueue) {
 			retryQueue.offer(message);
 			retryQueue.notify();
 		}
 	}
 
-	private Message buildMessage(Template template, List<String> templateData, MessagePriority messagePriority,
+	private List<Message> buildMessage(Template template, List<String> templateData, MessagePriority messagePriority,
 			User user, List<NotificationChannel> notificationChannelList) {
-		Message message = new Message();
-		String templateStr = template.returnTemplate(templateData);
+		List<Message> messageList = new ArrayList<>();
+		for (NotificationChannel notificationChannel : notificationChannelList) {
+			Message message = new Message();
+			String templateStr = template.returnTemplate(templateData);
 
-		message.setData(templateStr);
-		message.setMessagePriority(messagePriority);
-		message.setUser(user);
-		message.setNotificationChannelList(notificationChannelList);
-		message.setMessageStatus(MessageStatus.PENDING);
-		return message;
+			message.setData(templateStr);
+			message.setMessagePriority(messagePriority);
+			message.setUser(user);
+			message.setNotificationChannel(notificationChannel);
+			message.setMessageStatus(MessageStatus.PENDING);
+			messageList.add(message);
+		}
+		return messageList;
 	}
 
 	public void viewMessageHistory() {

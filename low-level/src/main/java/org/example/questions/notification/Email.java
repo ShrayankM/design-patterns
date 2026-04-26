@@ -9,6 +9,11 @@ public class Email implements NotificationChannel {
 		return sendEmail(message);
 	}
 
+	@Override
+	public String viewNotificationChannel() {
+		return "email";
+	}
+
 	private boolean sendEmail(Message message) {
 		User user = message.getUser();
 		String emailAddress = user.getEmailAddress();

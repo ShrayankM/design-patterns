@@ -9,6 +9,11 @@ public class Sms implements NotificationChannel {
 		return sendSms(message);
 	}
 
+	@Override
+	public String viewNotificationChannel() {
+		return "sms";
+	}
+
 	private boolean sendSms(Message message) {
 		User user = message.getUser();
 		String phoneNumber = user.getPhoneNumber();

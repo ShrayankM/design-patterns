@@ -3,7 +3,6 @@ package org.example.questions.notification;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.List;
 
 @Setter
 public class Message {
@@ -13,8 +12,11 @@ public class Message {
 	private MessagePriority messagePriority;
 	@Getter
 	private User user;
+//	@Getter
+//	private List<NotificationChannel> notificationChannelList;
+
 	@Getter
-	private List<NotificationChannel> notificationChannelList;
+	private NotificationChannel notificationChannel;
 	private MessageStatus messageStatus;
 	@Getter
 	private Long retryCount;
@@ -23,6 +25,8 @@ public class Message {
 		System.out.println("Data: " + data
 				+ " | Priority: " + messagePriority
 				+ " | Status: " + messageStatus
-				+ " | RetryCount: " + retryCount);
+				+ " | RetryCount: " + retryCount
+				+ " | Channel: " + notificationChannel.viewNotificationChannel()
+		);
 	}
 }
